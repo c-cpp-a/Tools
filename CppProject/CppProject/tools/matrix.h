@@ -1,12 +1,13 @@
 #ifndef MATRIX_H_H
 #define MATRIX_H_H
+#include "BigInt.h"
 #include <iostream>
 #include <string>
 #include <vector>
 using namespace std;
 template <typename Int> class Matrix {
   public:
-    typedef string::size_type len_type;
+    typedef typename vector<Int>::size_type len_type;
 
   private:
     len_type n, m;           // n行m列
@@ -14,6 +15,7 @@ template <typename Int> class Matrix {
   private:
     //私有函数
     bool check(const len_type, const len_type) const; //检查是否超界
+    static len_type find_maxsize(const vector<vector<Int>> &a);//返回数组的最大长度
   public:
     //构造函数&解析函数
     Matrix(const len_type& _n, const len_type& _m); //初始化（传变量）
@@ -32,6 +34,7 @@ template <typename Int> class Matrix {
     const len_type& sizei() const;       //返回矩阵的行数
     const len_type& sizej() const;       //返回矩阵的列数
     const Matrix<Int> transpose() const; //返回转置矩阵
+    const Int trace() const;//返回矩阵的迹
   public:
     //重载符号
     const vector<Int>&
@@ -54,9 +57,9 @@ template <typename Int> class Matrix {
     const Matrix<Int> operator-=(const Matrix<Int>&&); //矩阵减法（值）
     const Matrix<Int> operator*=(const Matrix<Int>&); //矩阵乘法（变量）
     const Matrix<Int> operator*=(const Matrix<Int>&&); //矩阵乘法（值）
-    const Matrix<Int> operator*=(const Int&); //矩阵乘法（数：变量）
+    const Matrix<Int> operator*=(const Int&);  //矩阵乘法（数：变量）
     const Matrix<Int> operator*=(const Int&&); //矩阵乘法（数：值）
-    const Matrix<Int> operator/=(const Int&); //矩阵除法（数：变量）
+    const Matrix<Int> operator/=(const Int&);  //矩阵除法（数：变量）
     const Matrix<Int> operator/=(const Int&&); //矩阵除法（数：值）
 };
 //外部函数
@@ -87,4 +90,5 @@ inline const Matrix<Int> operator*(const Int&& a,
 
 //定义的默认矩阵
 typedef Matrix<int> matrix;
+typedef Matrix<BigInt> Bigmatrix;
 #endif

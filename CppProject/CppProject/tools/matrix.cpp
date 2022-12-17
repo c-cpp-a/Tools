@@ -1,13 +1,22 @@
 #ifndef MATRIX_CPP_CPP_
 #define MATRIX_CPP_CPP_
 #include "matrix.h"
+#include <algorithm>
 #include <iterator>
-
 //私有函数
 template <typename Int>
 bool Matrix<Int>::check(const Matrix::len_type _i,
                         const Matrix::len_type _j) const {
     return (_i >= 0 && _i < n && _j >= 0 && _j < m);
+}
+template <typename Int>
+typename Matrix<Int>::len_type
+Matrix<Int>::find_maxsize(const vector<vector<Int>>& a) {
+    len_type maxx = a[0].size();
+    for (len_type i = 1, len = a.size(); i < len; i++) {
+        maxx = max(a[i].size(), maxx);
+    }
+    return maxx;
 }
 
 //构造函数&解析函数
@@ -42,13 +51,8 @@ Matrix<Int>::Matrix(const Matrix::len_type&& _n, const Matrix::len_type&& _m)
     }
 }
 template <typename Int>
-Matrix<Int>::Matrix(vector<vector<Int>>& _val) : n(_val.size()), val(_val) {
-    if (n) {
-        m = _val[0].size();
-    } else {
-        m = 0;
-    }
-}
+Matrix<Int>::Matrix(vector<vector<Int>>& _val)
+    : Matrix(_val, _val.size(), find_maxsize(_val)) {}
 template <typename Int>
 Matrix<Int>::Matrix(vector<vector<Int>>& _val, const Matrix::len_type _n,
                     const Matrix::len_type _m)
@@ -58,15 +62,21 @@ Matrix<Int>::Matrix(vector<vector<Int>>& _val, const Matrix::len_type _n,
                 "Matrix::len_type _n,const Matrix::len_type _m):n<0 || m<0!\n";
         Matrix();
         return;
-    } else if (_val.size() < n) {
+    } else if (_val.size() < n || find_maxsize(_val) < m) {
         cerr << "Matrix<Int>::Matrix(vector<vector<Int>>& _val, const "
                 "Matrix::len_type _n,const Matrix::len_type _m):_val size too "
                 "small!\n";
+        Matrix();
+        return;
     }
     for (Matrix::len_type i = 0; i < n; i++) {
         val.push_back(vector<int>());
         for (Matrix::len_type j = 0; j < m; j++) {
-            val[i].push_back(_val[i][j]);
+            if (j > _val[i].size()) {
+                val[i].push_back(Int());
+            } else {
+                val[i].push_back(_val[i][j]);
+            }
         }
     }
 }
@@ -109,6 +119,20 @@ template <typename Int> const Matrix<Int> Matrix<Int>::transpose() const {
         }
     }
     return ans;
+}
+template <typename Int> const Int Matrix<Int>::trace() const {
+    if (sizei() != sizej()) {
+        cerr << "template<typename Int> const Int Matrix<Int>::trace() "
+                "const:Matrix with different length and width cannot be "
+                "traced!\n";
+        throw;
+        return Int();
+    }
+    Int summ(0);
+    for (len_type i = 0; i < sizei(); i++) {
+        summ += val[i][i];
+    }
+    return summ;
 }
 
 //重载符号

@@ -10,6 +10,7 @@
 ```cpp
 const Matrix<Int> transpose() const;
 ```
+以及对矩阵求矩阵的迹（注意如果大小不是`N*N`的会出错）
 如果你需要将矩阵的元素改成其他的，请使用模板类
 ```cpp
 template <typename Int> class Matrix;
