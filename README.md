@@ -72,7 +72,7 @@ cout << BigInt(4279853LL)*BigInt(432978237LL);//输出1853083206559161
 
 `BigInt`类支持比较运算，包括`<`、`<=`、`>`、`>=`、`==`和`!=`。也就是说，你可以对一个元素为`BigInt`的数组进行排序，或者做别的事。
 
-- `UnsignedBigInt`类需要包含文件`BigInt.cpp`（同样注意是`tools`目录下的）。这个类的功能是实现无符号的大整型。它有以下构造函数：
+4. `UnsignedBigInt`类需要包含文件`BigInt.cpp`（同样注意是`tools`目录下的）。这个类的功能是实现无符号的大整型。它有以下构造函数：
 ```cpp
 UnsignedBigInt();//默认构造函数
 UnsignedBigInt(string& s);//用左值引用的string赋值
