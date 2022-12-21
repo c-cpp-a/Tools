@@ -10,6 +10,7 @@
 ```cpp
 const Matrix<Int> transpose() const;
 ```
+以及对矩阵求矩阵的迹（注意如果大小不是`N*N`的会出错）
 如果你需要将矩阵的元素改成其他的，请使用模板类
 ```cpp
 template <typename Int> class Matrix;
@@ -58,21 +59,22 @@ UnsignedBigInt::UnsignedBigInt(string&& s):find a char not number!;
 
 同时程序会立即终止（崩溃）。
 
-`BigInt`类也支持四则运算（除法还未实现）。如以下程序示范：
+`BigInt`类也支持四则运算和幂运算。如以下程序示范：
 ```cpp
 BigInt a=stirng("1"),b=string("1");
 cout << a+b;//输出2
 cout << a-b;//输出0
 cout << a*b;//输出1
+cout << a^b;//输出1
 ```
-`BigInt`类支持大数的运算（除法除外）。如：
+`BigInt`类支持大数的运算。如：
 ```cpp
 cout << BigInt(4279853LL)*BigInt(432978237LL);//输出1853083206559161
 ```
 
 `BigInt`类支持比较运算，包括`<`、`<=`、`>`、`>=`、`==`和`!=`。也就是说，你可以对一个元素为`BigInt`的数组进行排序，或者做别的事。
 
-4. `UnsignedBigInt`类需要包含文件`BigInt.cpp`（同样注意是`tools`目录下的）。这个类的功能是实现无符号的大整型。它有以下构造函数：
+- `UnsignedBigInt`类需要包含文件`BigInt.cpp`（同样注意是`tools`目录下的）。这个类的功能是实现无符号的大整型。它有以下构造函数：
 ```cpp
 UnsignedBigInt();//默认构造函数
 UnsignedBigInt(string& s);//用左值引用的string赋值
@@ -87,3 +89,8 @@ const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt&& a) const:(
 
 还会有一些别的错误，主要是由于**用户尝试得到负数**导致的。
 
+## 版本更新
+
+--snip--
+
+2022/12/21: 已经添加了除法运算。现在正在尝试对`BigInt`类和`UnsignedBigInt`类做开平方根的运算。有知道代码的可以联系我。
