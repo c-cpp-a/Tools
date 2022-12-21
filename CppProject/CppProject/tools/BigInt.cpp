@@ -5,26 +5,37 @@
 #include <cmath>
 #include <exception>
 #include <type_traits>
+#include <vector>
 //构造函数&解析函数
-UnsignedBigInt::UnsignedBigInt() {
-    // pass
-}
+UnsignedBigInt::UnsignedBigInt() { val.push_back(0); }
 UnsignedBigInt::UnsignedBigInt(string& s) {
-    string::size_type len = s.length();
-    for (string::size_type i = 0; i < len; i++) {
+    string::size_type len = s.length(), i = 0;
+    while (i < len && s[i] == '0')
+        ++i;
+    if (i == len) {
+        val.push_back(0);
+        return;
+    }
+    for (; i < len; i++) {
         if (isdigit(s[i]))
             val.push_back(s[i] - '0');
         else {
             val = vector<value_type>();
-            cerr << "UnsignedBigInt::UnsignedBigInt(string& s):find a char not "
-                    "number!\n";
-            throw;
+            cerr << "UnsignedBigInt::UnsignedBigInt(string& s):find a char "
+                    "not number!\n";
+            throw exception();
         }
     }
 }
 UnsignedBigInt::UnsignedBigInt(string&& s) {
-    string::size_type len = s.length();
-    for (string::size_type i = 0; i < len; i++) {
+    string::size_type len = s.length(), i = 0;
+    while (i < len && s[i] == '0')
+        ++i;
+    if (i == len - 1) {
+        val.push_back(0);
+        return;
+    }
+    for (; i < len; i++) {
         if (isdigit(s[i]))
             val.push_back(s[i] - '0');
         else {
@@ -37,6 +48,7 @@ UnsignedBigInt::UnsignedBigInt(string&& s) {
 }
 UnsignedBigInt::UnsignedBigInt(unsigned long long _val) {
     if (_val == 0) {
+        val.push_back(0);
         return;
     }
     while (_val) {
@@ -45,6 +57,8 @@ UnsignedBigInt::UnsignedBigInt(unsigned long long _val) {
     }
     val = vector<value_type>(val.rbegin(), val.rend());
 }
+UnsignedBigInt::UnsignedBigInt(const vector<value_type>& _val) : val(_val) {}
+UnsignedBigInt::UnsignedBigInt(const vector<value_type>&& _val) : val(_val) {}
 //类型转换函数
 UnsignedBigInt::operator string() const {
     string ans;
@@ -54,10 +68,17 @@ UnsignedBigInt::operator string() const {
     return ans;
 }
 //普通函数
-const UnsignedBigInt UnsignedBigInt::factorial() const{
+const UnsignedBigInt UnsignedBigInt::factorial() const {
     UnsignedBigInt ans(1U);
-    for(UnsignedBigInt i=2;i<=(*this);++i){
-        ans*=i;
+    for (UnsignedBigInt i = 2; i <= (*this); ++i) {
+        ans *= i;
+    }
+    return ans;
+}
+const UnsignedBigInt::maxinteger_type UnsignedBigInt::value() const {
+    UnsignedBigInt::maxinteger_type ans = 0;
+    for (auto it = val.rbegin(); it != val.rend(); ++it) {
+        ans = ans * 10 + *it;
     }
     return ans;
 }
@@ -134,7 +155,7 @@ const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt& a) const {
     if (ans.val.empty()) {
         ans.val.push_back(0U);
     }
-    ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend());
+    ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend() - 1);
     return ans;
 }
 const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt&& a) const {
@@ -236,6 +257,70 @@ const UnsignedBigInt UnsignedBigInt::operator*(const UnsignedBigInt&& a) const {
         ans.val.push_back(0);
     }
     ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend());
+    return ans;
+}
+const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt& a) const {
+    if (a == 0U) { //不能除以0
+        cerr << "const UnsignedBigInt UnsignedBigInt::operator/(const "
+                "UnsignedBigInt& a) const:Cannot with zero!\n";
+        throw exception();
+        return 0LL;
+    } else if (a == 1U) { //除以1返回自身
+        return (*this);
+    }
+    UnsignedBigInt ans, t(*this), t2(a);
+    ans.val.pop_back();
+    while (t >= a) {
+        while (t2 <= t) {
+            t2.val.push_back(0);
+        }
+        t2.val.pop_back();
+        ans.val.push_back(0);
+        while (t >= t2) {
+            t -= t2;
+            ++ans.val[ans.val.size() - 1];
+        }
+        t2.val.pop_back();
+    }
+
+    while (ans.val.size() && ans.val[0] == 0) {
+        ans.val.erase(ans.val.begin());
+    }
+    if (ans.val.empty()) {
+        ans.val.push_back(0);
+    }
+    return ans;
+}
+const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt&& a) const {
+    if (a == 0U) { //不能除以0
+        cerr << "const UnsignedBigInt UnsignedBigInt::operator/(const "
+                "UnsignedBigInt& a) const:Cannot with zero!\n";
+        throw exception();
+        return 0LL;
+    } else if (a == 1U) { //除以1返回自身
+        return (*this);
+    }
+    UnsignedBigInt ans, t(*this), t2(a);
+    ans.val.pop_back();
+    while (t >= a) {
+        while (t2 <= t) {
+            t2.val.push_back(0);
+        }
+        t2.val.pop_back();
+        ans.val.push_back(0);
+        while (t >= t2) {
+            t -= t2;
+            ++ans.val[ans.val.size() - 1];
+        }
+        t2.val.pop_back();
+    }
+
+    while (ans.val.size() && ans.val[0] == 0) {
+        ans.val.erase(ans.val.begin());
+    }
+    if (ans.val.empty()) {
+        ans.val.push_back(0);
+    }
     return ans;
 }
 const UnsignedBigInt
@@ -376,11 +461,20 @@ BigInt::BigInt(const UnsignedBigInt& _val) : val(_val), sign(false) {}
 BigInt::BigInt(UnsignedBigInt&& _val) : val(_val), sign(false) {}
 //类型转换函数
 BigInt::operator string() const { return (sign ? "-" : "") + string(val); }
+BigInt::operator UnsignedBigInt() const {
+    if(sign){
+        cerr << "BigInt::operator UnsignedBigInt() const:Cannot give class UnsignedBigInt a negative number!\n";
+        throw exception();
+        return UnsignedBigInt();
+    }
+    return val;
+}
 //普通函数
 bool BigInt::isnegative() const { return !sign; }
-const BigInt BigInt::factorial() const{
-    if(sign){
-        cerr << "const BigInt BigInt::factorial() const:The factorial of a negative integer is undefined!\n";
+const BigInt BigInt::factorial() const {
+    if (sign) {
+        cerr << "const BigInt BigInt::factorial() const:The factorial of a "
+                "negative integer is undefined!\n";
         throw exception();
         return 0LL;
     }
@@ -478,6 +572,22 @@ const BigInt BigInt::operator*(const BigInt&& a) const {
     else
         return val *
                a.val; //相同符号，要么正正得正，要么负负得正，都是绝对值相乘
+}
+const BigInt BigInt::operator/(const BigInt& a) const {
+    //异或运算规则：相同为false，不同为true
+    if (a.sign ^ sign)
+        return -BigInt(
+            val / a.val); //不同符号，一定有一个是负号，所以是绝对值相除再取负
+    else
+        return val / a.val; //相同符号，符号会互相抵消，所以是绝对值相除
+}
+const BigInt BigInt::operator/(const BigInt&& a) const {
+    //异或运算规则：相同为false，不同为true
+    if (a.sign ^ sign)
+        return -BigInt(
+            val / a.val); //不同符号，一定有一个是负号，所以是绝对值相除再取负
+    else
+        return val / a.val; //相同符号，符号会互相抵消，所以是绝对值相除
 }
 const BigInt BigInt::operator^(const BigInt::maxinteger_type& a) const {
     if (a & sign) { //如果a为奇数而且sign是true（负数）
