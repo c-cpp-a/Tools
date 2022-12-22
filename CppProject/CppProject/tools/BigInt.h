@@ -38,6 +38,8 @@ class UnsignedBigInt {
     const UnsignedBigInt operator*(const UnsignedBigInt&&) const;
     const UnsignedBigInt operator/(const UnsignedBigInt&) const;
     const UnsignedBigInt operator/(const UnsignedBigInt&&) const;
+    const UnsignedBigInt operator%(const UnsignedBigInt&) const;
+    const UnsignedBigInt operator%(const UnsignedBigInt&&) const;
     const UnsignedBigInt operator^(const maxinteger_type&)
         const; //快速幂，选用ull是因为到这里vector的size已经到极限了。
     const UnsignedBigInt operator^(const maxinteger_type&&)
@@ -66,12 +68,19 @@ class UnsignedBigInt {
     inline const UnsignedBigInt operator/=(const UnsignedBigInt&& a) {
         return ((*this) = (*this) / a);
     }
+    inline const UnsignedBigInt operator%=(const maxinteger_type& a) {
+        return ((*this) = (*this) % a);
+    }
+    inline const UnsignedBigInt operator%=(const maxinteger_type&& a) {
+        return ((*this) = (*this) % a);
+    }
     inline const UnsignedBigInt operator^=(const maxinteger_type& a) {
         return ((*this) = (*this) ^ a);
     }
     inline const UnsignedBigInt operator^=(const maxinteger_type&& a) {
         return ((*this) = (*this) ^ a);
     }
+
     inline const UnsignedBigInt operator++() { return ((*this) += 1U); }
     inline const UnsignedBigInt operator++(int) {
         auto res = (*this);
@@ -138,6 +147,8 @@ class BigInt {
     const BigInt operator*(const BigInt&&) const;
     const BigInt operator/(const BigInt&) const;
     const BigInt operator/(const BigInt&&) const;
+    const BigInt operator%(const BigInt&) const;
+    const BigInt operator%(const BigInt&&) const;
     const BigInt operator^(const maxinteger_type&) const;
     const BigInt operator^(const maxinteger_type&&) const;
     inline const BigInt operator+=(const BigInt& a) {

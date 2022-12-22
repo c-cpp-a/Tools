@@ -24,6 +24,7 @@ UnsignedBigInt::UnsignedBigInt(string& s) {
             cerr << "UnsignedBigInt::UnsignedBigInt(string& s):find a char "
                     "not number!\n";
             throw exception();
+            return;
         }
     }
 }
@@ -43,6 +44,7 @@ UnsignedBigInt::UnsignedBigInt(string&& s) {
             cerr << "UnsignedBigInt::UnsignedBigInt(string&& s):find a char "
                     "not number!\n";
             throw exception();
+            return;
         }
     }
 }
@@ -88,19 +90,23 @@ const UnsignedBigInt UnsignedBigInt::operator+(const UnsignedBigInt& a) const {
         return a + (*this);
     UnsignedBigInt ans;
     size_type lena = val.size(), lenb = a.val.size(), x = 0; // lena<=lenb
+    ans.val.pop_back();
     for (size_type i = 0; i < lenb; i++) {
-        ans.val.push_back(0U);
-    }
-    for (size_type i = 0; i < lenb; i++) {
-        if (i > lena)
-            ans.val[i] = a.val[lenb - i - 1] + x;
+        if (i >= lena)
+            ans.val.push_back(a.val[lenb - i - 1] + x);
         else
-            ans.val[i] = val[lena - i - 1] + a.val[lenb - i - 1] + x;
+            ans.val.push_back(val[lena - i - 1] + a.val[lenb - i - 1] + x);
         x = ans.val[i] / 10;
         ans.val[i] %= 10;
     }
     if (x) {
         ans.val.push_back(x);
+    }
+    while (ans.val.size() && ans.val.back() == 0) {
+        ans.val.pop_back();
+    }
+    if (ans.val.empty()) {
+        ans.val.push_back(0);
     }
     ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend());
 
@@ -111,8 +117,9 @@ const UnsignedBigInt UnsignedBigInt::operator+(const UnsignedBigInt&& a) const {
         return a + (*this);
     UnsignedBigInt ans;
     size_type lena = val.size(), lenb = a.val.size(), x = 0; // lena<=lenb
+    ans.val.pop_back();
     for (size_type i = 0; i < lenb; i++) {
-        if (i > lena)
+        if (i >= lena)
             ans.val.push_back(a.val[lenb - i - 1] + x);
         else
             ans.val.push_back(val[lena - i - 1] + a.val[lenb - i - 1] + x);
@@ -121,6 +128,12 @@ const UnsignedBigInt UnsignedBigInt::operator+(const UnsignedBigInt&& a) const {
     }
     if (x) {
         ans.val.push_back(x);
+    }
+    while (ans.val.size() && ans.val.back() == 0) {
+        ans.val.pop_back();
+    }
+    if (ans.val.empty()) {
+        ans.val.push_back(0);
     }
     ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend());
 
@@ -131,6 +144,7 @@ const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt& a) const {
         cerr << "const UnsignedBigInt UnsignedBigInt::operator-(const "
                 "UnsignedBigInt& a) const:(*this)<a not alivible!\n";
         throw exception();
+        return UnsignedBigInt();
     }
     UnsignedBigInt ans;
     size_type lena = val.size(), lenb = a.val.size(), x = 0; // lena>=lenb
@@ -148,21 +162,22 @@ const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt& a) const {
             ans.val.push_back(static_cast<value_type>(tmp));
         }
     }
-    while (ans.val.size() && *(ans.val.end() - 1) == 0) {
+    while (ans.val.size() && ans.val.back() == 0) {
         ans.val.pop_back();
     }
-
     if (ans.val.empty()) {
-        ans.val.push_back(0U);
+        return 0U;
+    } else {
+        ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend() - 1);
+        return ans;
     }
-    ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend() - 1);
-    return ans;
 }
 const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt&& a) const {
     if ((*this) < a) {
         cerr << "const UnsignedBigInt UnsignedBigInt::operator-(const "
-                "UnsignedBigInt& a) const:(*this)<a not alivible!\n";
+                "UnsignedBigInt&& a) const:(*this)<a not alivible!\n";
         throw exception();
+        return UnsignedBigInt();
     }
     UnsignedBigInt ans;
     size_type lena = val.size(), lenb = a.val.size(), x = 0; // lena>=lenb
@@ -180,10 +195,15 @@ const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt&& a) const {
             ans.val.push_back(static_cast<value_type>(tmp));
         }
     }
-    while (*(ans.val.end() - 1) == 0)
+    while (ans.val.size() && ans.val.back() == 0) {
         ans.val.pop_back();
-    ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend());
-    return ans;
+    }
+    if (ans.val.empty()) {
+        return 0U;
+    } else {
+        ans.val = vector<value_type>(ans.val.rbegin(), ans.val.rend() - 1);
+        return ans;
+    }
 }
 const UnsignedBigInt UnsignedBigInt::operator*(const UnsignedBigInt& a) const {
     UnsignedBigInt ans;
@@ -264,27 +284,26 @@ const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt& a) const {
         cerr << "const UnsignedBigInt UnsignedBigInt::operator/(const "
                 "UnsignedBigInt& a) const:Cannot with zero!\n";
         throw exception();
-        return 0LL;
+        return UnsignedBigInt();
     } else if (a == 1U) { //除以1返回自身
         return (*this);
     }
     UnsignedBigInt ans, t(*this), t2(a);
     ans.val.pop_back();
+    while (t2 <= t) {
+        t2.val.push_back(0);
+    }
     while (t >= a) {
-        while (t2 <= t) {
-            t2.val.push_back(0);
-        }
         t2.val.pop_back();
         ans.val.push_back(0);
         while (t >= t2) {
             t -= t2;
             ++ans.val[ans.val.size() - 1];
         }
-        t2.val.pop_back();
     }
-
-    while (ans.val.size() && ans.val[0] == 0) {
-        ans.val.erase(ans.val.begin());
+    while (t2 > a) {
+        ans.val.push_back(0);
+        t2.val.pop_back();
     }
     if (ans.val.empty()) {
         ans.val.push_back(0);
@@ -294,34 +313,75 @@ const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt& a) const {
 const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt&& a) const {
     if (a == 0U) { //不能除以0
         cerr << "const UnsignedBigInt UnsignedBigInt::operator/(const "
-                "UnsignedBigInt& a) const:Cannot with zero!\n";
+                "UnsignedBigInt&& a) const:Cannot with zero!\n";
         throw exception();
-        return 0LL;
+        return UnsignedBigInt();
     } else if (a == 1U) { //除以1返回自身
         return (*this);
     }
     UnsignedBigInt ans, t(*this), t2(a);
     ans.val.pop_back();
+    while (t2 <= t) {
+        t2.val.push_back(0);
+    }
     while (t >= a) {
-        while (t2 <= t) {
-            t2.val.push_back(0);
-        }
         t2.val.pop_back();
         ans.val.push_back(0);
         while (t >= t2) {
             t -= t2;
             ++ans.val[ans.val.size() - 1];
         }
-        t2.val.pop_back();
     }
-
-    while (ans.val.size() && ans.val[0] == 0) {
-        ans.val.erase(ans.val.begin());
+    while (t2 > a) {
+        ans.val.push_back(0);
+        t2.val.pop_back();
     }
     if (ans.val.empty()) {
         ans.val.push_back(0);
     }
     return ans;
+}
+const UnsignedBigInt UnsignedBigInt::operator%(const UnsignedBigInt& a) const {
+    if (a == 0U) { //不能对0取余
+        cerr << "const UnsignedBigInt UnsignedBigInt::operator%(const "
+                "UnsignedBigInt& a) const:Cannot with zero!\n";
+        throw exception();
+        return UnsignedBigInt();
+    } else if (a == 1U) { //任何数%1就是0
+        return 0;
+    }
+    UnsignedBigInt t(*this), t2(a);
+    while (t2 <= t) {
+        t2.val.push_back(0);
+    }
+    while (t >= a) {
+        t2.val.pop_back();
+        while (t >= t2) {
+            t -= t2;
+        }
+    }
+    return t;
+}
+const UnsignedBigInt UnsignedBigInt::operator%(const UnsignedBigInt&& a) const {
+    if (a == 0U) { //不能对0取余
+        cerr << "const UnsignedBigInt UnsignedBigInt::operator%(const "
+                "UnsignedBigInt&& a) const:Cannot with zero!\n";
+        throw exception();
+        return UnsignedBigInt();
+    } else if (a == 1U) { //任何数%1就是0
+        return 0;
+    }
+    UnsignedBigInt t(*this), t2(a);
+    while (t2 <= t) {
+        t2.val.push_back(0);
+    }
+    while (t >= a) {
+        t2.val.pop_back();
+        while (t >= t2) {
+            t -= t2;
+        }
+    }
+    return t;
 }
 const UnsignedBigInt
 UnsignedBigInt::operator^(const UnsignedBigInt::maxinteger_type& a) const {
@@ -430,7 +490,7 @@ istream& operator>>(istream& is, UnsignedBigInt&& a) {
     return is;
 }
 
-// BigINT类
+// BigInt类
 //构造函数&解析函数
 BigInt::BigInt() : sign(false) {
     // pass
@@ -462,8 +522,9 @@ BigInt::BigInt(UnsignedBigInt&& _val) : val(_val), sign(false) {}
 //类型转换函数
 BigInt::operator string() const { return (sign ? "-" : "") + string(val); }
 BigInt::operator UnsignedBigInt() const {
-    if(sign){
-        cerr << "BigInt::operator UnsignedBigInt() const:Cannot give class UnsignedBigInt a negative number!\n";
+    if (sign) {
+        cerr << "BigInt::operator UnsignedBigInt() const:Cannot give class "
+                "UnsignedBigInt a negative number!\n";
         throw exception();
         return UnsignedBigInt();
     }
@@ -588,6 +649,32 @@ const BigInt BigInt::operator/(const BigInt&& a) const {
             val / a.val); //不同符号，一定有一个是负号，所以是绝对值相除再取负
     else
         return val / a.val; //相同符号，符号会互相抵消，所以是绝对值相除
+}
+const BigInt BigInt::operator%(const BigInt& a) const {
+    switch ((sign << 1) | a.sign) {
+    case 0: //都是正数
+        return val % a.val;
+    case 1: //自己是正数，a是负数
+        return -BigInt(a.val - val % a.val);
+    case 2: //自己是负数，a是正数
+        return a.val - val % a.val;
+    case 3: //都是负数
+        return -BigInt(val % a.val);
+    }
+    return BigInt();
+}
+const BigInt BigInt::operator%(const BigInt&& a) const {
+    switch ((sign << 1) | a.sign) {
+    case 0: //都是正数
+        return val % a.val;
+    case 1: //自己是正数，a是负数
+        return -BigInt(a.val - val % a.val);
+    case 2: //自己是负数，a是正数
+        return a.val - val % a.val;
+    case 3: //都是负数
+        return -BigInt(val % a.val);
+    }
+    return BigInt();
 }
 const BigInt BigInt::operator^(const BigInt::maxinteger_type& a) const {
     if (a & sign) { //如果a为奇数而且sign是true（负数）
