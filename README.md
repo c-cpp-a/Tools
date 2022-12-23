@@ -62,12 +62,17 @@ UnsignedBigInt::UnsignedBigInt(string&& s):find a char not number!;
 
 `BigInt`类也支持四则运算、取余运算和幂运算。如以下程序示范：
 ```cpp
-BigInt a=stirng("1"),b=string("1");
+BigInt a=string("1"),b=string("1");
 cout << a+b;//输出2
 cout << a-b;//输出0
 cout << a*b;//输出1
 cout << a/b;//输出1
 cout << a%b;//输出0
+```
+但是幂运算的右操作数的类型不是`BigInt`，而是`BigInt::maxinteger_type`（保证为内置有符号整型）。程序示范如下：
+```cpp
+BigInt a=string("1");
+BigInt::maxinteger_type b=5;
 cout << a^b;//输出1
 ```
 和`int`一样，除法运算自动向下取整。如果你尝试除以0，程序将抛出以下错误中的一个：
@@ -134,4 +139,4 @@ Abs(a);//返回a的绝对值，仅适用于BigInt类
 
 对于一个长度为a的`UnsignedBigInt`类和一个长度为b的`UnsignedBigInt`类（a是左操作数，b是右操作数），执行加法、减法的时间复杂度为O(max(a,b))，执行乘法、除法、取余的时间复杂度为O(ab)。
 
-对于一个长度为a的`UnsignedBigInt`类和一个`UnsignedBigInt::maxinteger_type`类型的数b，执行幂运算的时间复杂度为O(a^2 lg b)。
+对于一个长度为a的`UnsignedBigInt`类和一个`UnsignedBigInt::maxinteger_type`类型的数b，执行幂运算的时间复杂度为O(a^(lg b))。
