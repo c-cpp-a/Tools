@@ -116,7 +116,7 @@ class BigInt {
   public:
     typedef UnsignedBigInt::value_type value_type;
     typedef UnsignedBigInt::size_type size_type;
-    typedef UnsignedBigInt::maxinteger_type maxinteger_type;
+    typedef make_signed<UnsignedBigInt::maxinteger_type>::type maxinteger_type;
 
   private:
     UnsignedBigInt val; //值，每位一个数字，采用顺序存储
@@ -126,7 +126,7 @@ class BigInt {
     BigInt();
     BigInt(string& s);
     BigInt(string&& s);
-    BigInt(long long _val);
+    BigInt(maxinteger_type _val);
     BigInt(const UnsignedBigInt&);
     BigInt(UnsignedBigInt&&);
     ~BigInt() {}
@@ -189,11 +189,17 @@ class BigInt {
     }
     //重载比较运算符
     bool operator<(const BigInt&) const;
+    bool operator<(const BigInt&&) const;
     bool operator<=(const BigInt&) const;
-    inline bool operator>(const BigInt& a) const { return !((*this) <= a); }
-    inline bool operator>=(const BigInt& a) const { return !((*this) < a); }
+    bool operator<=(const BigInt&&) const;
     bool operator==(const BigInt&) const;
+    bool operator==(const BigInt&&) const;
+    inline bool operator>(const BigInt& a) const { return !((*this) <= a); }
+    inline bool operator>(const BigInt&& a) const { return !((*this) <= a); }
+    inline bool operator>=(const BigInt& a) const { return !((*this) < a); }
+    inline bool operator>=(const BigInt&& a) const { return !((*this) < a); }
     inline bool operator!=(const BigInt& a) const { return !((*this) == a); }
+    inline bool operator!=(const BigInt&& a) const { return !((*this) == a); }
 };
 inline ostream& operator<<(ostream& os, const BigInt& a) {
     os << string(a);

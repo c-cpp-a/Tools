@@ -11,9 +11,10 @@ int main() {
     // BigInt a;
     // cin >> a;
     // cout << "sqrt(" << a << ")=" << Sqrt(a);
-    BigInt a,b;
+    BigInt a;
+    BigInt::maxinteger_type b;
     cin >> a >> b;
-    cout << a << "%" << b << "=";
-    cout << a%b;
+    cout << a << "^" << b << "=";
+    cout << (a^b);
     return 0;
 }

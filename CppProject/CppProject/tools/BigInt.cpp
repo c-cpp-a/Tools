@@ -390,15 +390,16 @@ UnsignedBigInt::operator^(const UnsignedBigInt::maxinteger_type& a) const {
     else if (a == 1U)
         return (*this);
     else {
-        unsigned long long cnt = a;
-        UnsignedBigInt s(*this);
-        while (cnt > 1) {
+        UnsignedBigInt::maxinteger_type cnt = a;
+        UnsignedBigInt s((*this)), ans(1);
+        while (cnt) {
+            if (cnt & 1) {
+                ans *= s;
+            }
             s *= s;
-            if (cnt & 1)
-                s *= (*this);
             cnt >>= 1;
         }
-        return s;
+        return ans;
     }
 }
 const UnsignedBigInt
@@ -408,15 +409,16 @@ UnsignedBigInt::operator^(const UnsignedBigInt::maxinteger_type&& a) const {
     else if (a == 1U)
         return (*this);
     else {
-        unsigned long long cnt = a;
-        UnsignedBigInt s(*this);
-        while (cnt > 1) {
+        UnsignedBigInt::maxinteger_type cnt = a;
+        UnsignedBigInt s((*this)), ans(1);
+        while (cnt) {
+            if (cnt & 1) {
+                ans *= s;
+            }
             s *= s;
-            if (cnt & 1)
-                s *= (*this);
             cnt >>= 1;
         }
-        return s;
+        return ans;
     }
 }
 //重载比较运算符
@@ -677,14 +679,18 @@ const BigInt BigInt::operator%(const BigInt&& a) const {
     return BigInt();
 }
 const BigInt BigInt::operator^(const BigInt::maxinteger_type& a) const {
-    if (a & sign) { //如果a为奇数而且sign是true（负数）
+    if (a < 0) {           //如果a为负数
+        return 0;          //任何数的小于0的次方都小于1，忽略
+    } else if (a & sign) { //如果a为奇数而且sign是true（负数）
         return -BigInt(val ^ a);
     } else { //正数的幂次方都是正数，负数的偶数幂次方也是正数（很明显，负负得正）
         return (val ^ a);
     }
 }
 const BigInt BigInt::operator^(const BigInt::maxinteger_type&& a) const {
-    if (a & sign) { //如果a为奇数而且sign是true（负数）
+    if (a < 0) {           //如果a为负数
+        return 0;          //任何数的小于0的次方都小于1，忽略
+    } else if (a & sign) { //如果a为奇数而且sign是true（负数）
         return -BigInt(val ^ a);
     } else { //正数的幂次方都是正数，负数的偶数幂次方也是正数（很明显，负负得正）
         return (val ^ a);
@@ -692,6 +698,17 @@ const BigInt BigInt::operator^(const BigInt::maxinteger_type&& a) const {
 }
 //重载比较运算符
 bool BigInt::operator<(const BigInt& a) const {
+    if (sign < a.sign)
+        return false; //自己正a负，(*this)>a
+    else if (sign > a.sign)
+        return true; //自己负a正，(*this)<a
+    else if (sign) { //负数比大小：谁的绝对值小谁大
+        return val > a.val;
+    } else { //正数比大小：谁打绝对值大谁大
+        return val < a.val;
+    }
+}
+bool BigInt::operator<(const BigInt&& a) const {
     if (sign < a.sign)
         return false; //自己正a负，(*this)>a
     else if (sign > a.sign)
@@ -713,8 +730,27 @@ bool BigInt::operator<=(const BigInt& a) const {
         return val <= a.val;
     }
 }
+bool BigInt::operator<=(const BigInt&& a) const {
+    if (sign < a.sign)
+        return false; //自己正a负，(*this)>a
+    else if (sign > a.sign)
+        return true; //自己负a正，(*this)<a
+    else if (sign) { //负数比大小：谁的绝对值小谁大
+        return val >= a.val;
+    } else { //正数比大小：谁打绝对值大谁大
+        return val <= a.val;
+    }
+}
 bool BigInt::operator==(const BigInt& a) const {
-    if (sign != a.sign)
+    //异或运算规则：相同为false，不同为true
+    if (!(sign ^ a.sign))
+        return false; //符号不一样，值一定不一样
+    else
+        return val == a.val; //否则返回绝对值是否一样
+}
+bool BigInt::operator==(const BigInt&& a) const {
+    //异或运算规则：相同为false，不同为true
+    if (!(sign ^ a.sign))
         return false; //符号不一样，值一定不一样
     else
         return val == a.val; //否则返回绝对值是否一样

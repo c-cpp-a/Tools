@@ -24,7 +24,7 @@ UnsignedBigInt Sqrt(UnsignedBigInt x) {
     return right - 1;
 }
 BigInt Sqrt(const BigInt x) {
-    if (x < 0) {
+    if (x.isnegative()) {
         cerr << "BigInt Sqrt(const BigInt x):Cannot do sqrt() with "
                 "x<0!\n";
         throw exception();
