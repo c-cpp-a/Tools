@@ -123,6 +123,17 @@ Abs(a);//返回a的绝对值，仅适用于BigInt类
 ```
 因为`UnsignedBigInt`类是无符号类，本身就是正数，所以不用求绝对值。
 
+同时这里有一些函数工具：
+
+- `Code`命名空间中储存了加密解密的函数，需要包含`code.cpp`。其中实现了4个函数：
+```cpp
+const std::string decode_base64(const std::string&); //用base64解码，返回
+void decode_base64_this(std::string&); //用base64解码，原地操作
+const std::string encode_base64(const std::string&); //用base64加密，返回
+void encode_base64_this(std::string&); //用base64加密，原地操作
+```
+从注释中可以得知它们是用于`base64`编码的加密解密的。注意如果其中发生错误，程序会抛出类型为`Code::base64_error`的错误，成员`what`指出了具体错误。
+
 ## 版本更新
 
 --snip--
@@ -133,6 +144,8 @@ Abs(a);//返回a的绝对值，仅适用于BigInt类
 1. 修正一点小错误。
 2. 已经可以对`BigInt`类和`UnsignedBigInt`类做开平方根的运算了。
 3. 添加了`BigInt`类和`UnsignedBigInt`类的取余运算。
+
+2022/12/28:添加了`Code`函数工具命名空间，用于密码。
 
 ## 时间复杂度
 对于一个长`n`宽`m`的`Matrix`类，大部分操作的时间复杂度都为O(nm)。但是求矩阵的迹（`const Int trace() const;`）的时间复杂度为O(n)。
