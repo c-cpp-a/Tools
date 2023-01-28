@@ -206,14 +206,14 @@ const Matrix<Int> Matrix<Int>::operator-(const Matrix<Int>&& a) const {
 }
 template <typename Int>
 const Matrix<Int> Matrix<Int>::operator*(const Matrix<Int>& a) const {
-    if (a.sizei() != sizej() || a.sizej() != sizei()) {
+    if (sizej() != a.sizei()) {
         cerr << "const Matrix<Int> Matrix<Int>::operator+(const Matrix<Int> "
                 "&a):Matrix size does not match!\n";
         throw;
     }
-    Matrix<Int> ans(n, n);
-    for (Matrix::len_type i = 0; i < n; i++) {
-        for (Matrix::len_type j = 0; j < n; j++) {
+    Matrix<Int> ans(sizei(), a.sizej());
+    for (Matrix::len_type i = 0; i < sizei(); i++) {
+        for (Matrix::len_type j = 0; j < a.sizej(); j++) {
             for (Matrix::len_type k = 0; k < m; k++) {
                 ans[i][j] += val[i][k] * a[k][j];
             }
@@ -223,14 +223,14 @@ const Matrix<Int> Matrix<Int>::operator*(const Matrix<Int>& a) const {
 }
 template <typename Int>
 const Matrix<Int> Matrix<Int>::operator*(const Matrix<Int>&& a) const {
-    if (a.sizei() != sizej() || a.sizej() != sizei()) {
+    if (sizej() != a.sizei()) {
         cerr << "const Matrix<Int> Matrix<Int>::operator+(const Matrix<Int> "
-                "&a):Matrix size does not match!\n";
+                "&&a):Matrix size does not match!\n";
         throw;
     }
-    Matrix<Int> ans(n, n);
-    for (Matrix::len_type i = 0; i < n; i++) {
-        for (Matrix::len_type j = 0; j < n; j++) {
+    Matrix<Int> ans(sizei(), a.sizej());
+    for (Matrix::len_type i = 0; i < sizei(); i++) {
+        for (Matrix::len_type j = 0; j < a.sizej(); j++) {
             for (Matrix::len_type k = 0; k < m; k++) {
                 ans[i][j] += val[i][k] * a[k][j];
             }

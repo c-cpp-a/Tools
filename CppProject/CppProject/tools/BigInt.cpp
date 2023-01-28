@@ -7,8 +7,12 @@
 #include <type_traits>
 #include <vector>
 //构造函数&解析函数
-UnsignedBigInt::UnsignedBigInt() { val.push_back(0); }
-UnsignedBigInt::UnsignedBigInt(string& s) {
+UnsignedBigInt::UnsignedBigInt()
+    : isstrict(UnsignedBigInt::default_strict_mode) {
+    val.push_back(0);
+}
+UnsignedBigInt::UnsignedBigInt(string& s, mode_type _strict)
+    : isstrict(_strict) {
     string::size_type len = s.length(), i = 0;
     while (i < len && s[i] == '0')
         ++i;
@@ -20,19 +24,24 @@ UnsignedBigInt::UnsignedBigInt(string& s) {
         if (isdigit(s[i]))
             val.push_back(s[i] - '0');
         else {
-            val = vector<value_type>();
-            cerr << "UnsignedBigInt::UnsignedBigInt(string& s):find a char "
-                    "not number!\n";
-            throw exception();
-            return;
+            if (isstrict) {
+                val = vector<value_type>();
+                cerr << "UnsignedBigInt::UnsignedBigInt(string& s):find a char "
+                        "not number!\n";
+                throw exception();
+                return;
+            } else {
+                return;
+            }
         }
     }
 }
-UnsignedBigInt::UnsignedBigInt(string&& s) {
+UnsignedBigInt::UnsignedBigInt(string&& s, mode_type _strict)
+    : isstrict(_strict) {
     string::size_type len = s.length(), i = 0;
     while (i < len && s[i] == '0')
         ++i;
-    if (i == len - 1) {
+    if (i == len) {
         val.push_back(0);
         return;
     }
@@ -40,15 +49,21 @@ UnsignedBigInt::UnsignedBigInt(string&& s) {
         if (isdigit(s[i]))
             val.push_back(s[i] - '0');
         else {
-            val = vector<value_type>();
-            cerr << "UnsignedBigInt::UnsignedBigInt(string&& s):find a char "
-                    "not number!\n";
-            throw exception();
-            return;
+            if (isstrict) {
+                val = vector<value_type>();
+                cerr
+                    << "UnsignedBigInt::UnsignedBigInt(string&& s):find a char "
+                       "not number!\n";
+                throw exception();
+                return;
+            } else {
+                return;
+            }
         }
     }
 }
-UnsignedBigInt::UnsignedBigInt(unsigned long long _val) {
+UnsignedBigInt::UnsignedBigInt(unsigned long long _val, mode_type _strict)
+    : isstrict(_strict) {
     if (_val == 0) {
         val.push_back(0);
         return;
@@ -59,8 +74,10 @@ UnsignedBigInt::UnsignedBigInt(unsigned long long _val) {
     }
     val = vector<value_type>(val.rbegin(), val.rend());
 }
-UnsignedBigInt::UnsignedBigInt(const vector<value_type>& _val) : val(_val) {}
-UnsignedBigInt::UnsignedBigInt(const vector<value_type>&& _val) : val(_val) {}
+UnsignedBigInt::UnsignedBigInt(const vector<value_type>& _val, mode_type _strict)
+    : val(_val), isstrict(_strict) {}
+UnsignedBigInt::UnsignedBigInt(const vector<value_type>&& _val, mode_type _strict)
+    : val(_val), isstrict(_strict) {}
 //类型转换函数
 UnsignedBigInt::operator string() const {
     string ans;
@@ -71,7 +88,7 @@ UnsignedBigInt::operator string() const {
 }
 //普通函数
 const UnsignedBigInt UnsignedBigInt::factorial() const {
-    UnsignedBigInt ans(1U);
+    UnsignedBigInt ans(1U, isstrict);
     for (UnsignedBigInt i = 2; i <= (*this); ++i) {
         ans *= i;
     }
@@ -83,6 +100,10 @@ const UnsignedBigInt::maxinteger_type UnsignedBigInt::value() const {
         ans = ans * 10 + *it;
     }
     return ans;
+}
+void UnsignedBigInt::set_strict(strict_mode _strict) { isstrict = _strict; }
+UnsignedBigInt::strict_mode UnsignedBigInt::using_strict() const {
+    return static_cast<UnsignedBigInt::strict_mode>(isstrict);
 }
 //重载算术运算符
 const UnsignedBigInt UnsignedBigInt::operator+(const UnsignedBigInt& a) const {
@@ -391,7 +412,7 @@ UnsignedBigInt::operator^(const UnsignedBigInt::maxinteger_type& a) const {
         return (*this);
     else {
         UnsignedBigInt::maxinteger_type cnt = a;
-        UnsignedBigInt s((*this)), ans(1);
+        UnsignedBigInt s((*this)), ans(1, isstrict);
         while (cnt) {
             if (cnt & 1) {
                 ans *= s;
@@ -410,7 +431,7 @@ UnsignedBigInt::operator^(const UnsignedBigInt::maxinteger_type&& a) const {
         return (*this);
     else {
         UnsignedBigInt::maxinteger_type cnt = a;
-        UnsignedBigInt s((*this)), ans(1);
+        UnsignedBigInt s((*this)), ans(1, isstrict);
         while (cnt) {
             if (cnt & 1) {
                 ans *= s;
@@ -494,24 +515,25 @@ istream& operator>>(istream& is, UnsignedBigInt&& a) {
 
 // BigInt类
 //构造函数&解析函数
-BigInt::BigInt() : sign(false) {
-    // pass
-}
-BigInt::BigInt(string& s) : sign(false) {
+BigInt::BigInt() : sign(false) {}
+BigInt::BigInt(string& s, mode_type _strict) : sign(false) {
+    val.set_strict(static_cast<strict_mode>(_strict));
     if (s[0] == '-') { //负数
         sign = true;
         s.erase(s.begin());
     }
     val = s;
 }
-BigInt::BigInt(string&& s) : sign(false) {
+BigInt::BigInt(string&& s, mode_type _strict) : sign(false) {
+    val.set_strict(static_cast<strict_mode>(_strict));
     if (s[0] == '-') { //负数
         sign = true;
         s.erase(s.begin());
     }
     val = s;
 }
-BigInt::BigInt(long long _val) {
+BigInt::BigInt(long long _val, mode_type _strict) {
+    val.set_strict(static_cast<strict_mode>(_strict));
     if (_val >= 0) {
         val = _val;
     } else {
@@ -520,7 +542,7 @@ BigInt::BigInt(long long _val) {
     }
 }
 BigInt::BigInt(const UnsignedBigInt& _val) : val(_val), sign(false) {}
-BigInt::BigInt(UnsignedBigInt&& _val) : val(_val), sign(false) {}
+BigInt::BigInt(UnsignedBigInt&& _val) noexcept : val(_val), sign(false) {}
 //类型转换函数
 BigInt::operator string() const { return (sign ? "-" : "") + string(val); }
 BigInt::operator UnsignedBigInt() const {
@@ -543,6 +565,8 @@ const BigInt BigInt::factorial() const {
     }
     return val.factorial();
 }
+void BigInt::set_strict(strict_mode _strict) { val.set_strict(_strict); }
+BigInt::strict_mode BigInt::using_strict() const { return val.using_strict(); }
 //重载算术运算符
 const BigInt BigInt::operator-() const {
     BigInt ans;

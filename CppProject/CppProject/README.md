@@ -27,9 +27,49 @@ BigInt(string& s);//用左值引用的string赋值
 BigInt(string&& s);//用右值引用的string赋值
 BigInt(long long _val);//用long long赋值（其他整型都会进行提升）
 BigInt(const UnsignedBigInt&);//用左值引用的UnsignedBigInt赋值（稍后会讲）
-BigInt(UnsignedBigInt&&);//用右值引用的UnsignedBigInt赋值（稍后会讲）
+BigInt(UnsignedBigInt&&) noexcept;//用右值引用的UnsignedBigInt赋值（稍后会讲）
 ```
-注意如果采用`string`赋值，数据**必须保证没有任何非整数的字符，否则程序将抛出以下错误中的一个**：
+
+
+`BigInt`类可以设置严格模式或非严格模式。模式由一个`BigInt::strict_type`的`enum`指定。这个`enum`的类型是`BigInt::modetype`，定义如下：
+```cpp
+// in class UnsignedBigInt
+enum strict_mode : mode_type {
+    UnsignedBigIntUnUseStrict,//非严格模式
+    UnsignedBigIntUseStrict//严格模式
+};
+```
+而`BigInt`类引用了相关内容：
+```cpp
+// in class BigInt
+typedef UnsignedBigInt::strict_mode strict_mode;
+typedef UnsignedBigInt::mode_type mode_type;
+```
+`BigInt`类的构造函数（默认构造函数和复制构造函数除外）后面可以指定严格模式或非严格模式，即：
+```cpp
+BigInt(string& s, bool _strict = UnsignedBigInt::default_strict_mode);
+BigInt(string&& s, bool _strict = UnsignedBigInt::default_strict_mode);
+BigInt(maxinteger_type _val, bool _strict = UnsignedBigInt::default_strict_mode);
+```
+如果不指定后面的参数，将自动设置为默认模式。默认模式由`UnsignedBigInt::default_strict_mode`指定。
+
+对于一个`BigInt`类对象`a`（`a`为非`const`对象），有设置模式的函数：
+```cpp
+void set_strict(strict_mode _strict);
+```
+可以重新设置`a`的模式。
+
+如果要查询一个`BigInt`类对象的模式，可以使用函数：
+```cpp
+strict_mode using_strict() const;
+```
+返回这个对象（可以是`const`的）的模式。
+
+**模式用途**：设置严格模式可以检查并报错，非严格模式不会对任何函数、运算符或构造函数进行检查，如果出错，只会返回一个空的对象。以后的出错（对`UnsignedBigInt`对象也适用，后面详解）是指开启严格模式的情况下的报错，不再赘述。
+
+**建议**：最好开启严格模式，否则必须自己检查错误。
+
+注意构造函数如果采用`string`赋值，数据**必须保证没有任何非整数的字符，否则程序将抛出以下错误中的一个**：
 ```
 UnsignedBigInt::UnsignedBigInt(string& s):find a char not number!;
 UnsignedBigInt::UnsignedBigInt(string&& s):find a char not number!;
@@ -147,9 +187,21 @@ void encode_base64_this(std::string&); //用base64加密，原地操作
 
 2022/12/28:添加了`Code`函数工具命名空间，用于密码。
 
+2023/1/3:放松了`matrix`类相乘的限制，现在一个`N`行`L`列的矩阵可以乘以一个`L`行`M`列的矩阵，不再要求`N`和`M`相等。
+
+2023/1/28:
+1. 添加了`BigInt`类和`UnsignedBigInt`类的是否严格模式的设置。
+2. 添加分数模板类`Fraction`，但未实现其功能。
+
 ## 时间复杂度
 对于一个长`n`宽`m`的`Matrix`类，大部分操作的时间复杂度都为O(nm)。但是求矩阵的迹（`const Int trace() const;`）的时间复杂度为O(n)。
 
 对于一个长度为a的`UnsignedBigInt`类和一个长度为b的`UnsignedBigInt`类（a是左操作数，b是右操作数），执行加法、减法的时间复杂度为O(max(a,b))，执行乘法、除法、取余的时间复杂度为O(ab)。
 
 对于一个长度为a的`UnsignedBigInt`类和一个`UnsignedBigInt::maxinteger_type`类型的数b，执行幂运算的时间复杂度为O(a^(lg b))。
+
+## 注意事项
+
+导入的时候请注意导入的后缀名为`.cpp`，这一点与标准库不同。
+
+程序的报错会通过`cerr`进行，如果不想显示可以对`cerr`进行重定向。
