@@ -196,6 +196,10 @@ void encode_base64_this(std::string&); //用base64加密，原地操作
 1. 添加了`BigInt`类和`UnsignedBigInt`类的是否严格模式的设置。
 2. 添加分数模板类`Fraction`，但未实现其功能。
 
+2023/2/5:
+1. 实现了分数模板类`Fraction`的部分构造函数，但开发方向可能不在这上面。
+2. 修复了若干`BigInt`类的bug，并采取新的测试方式。
+
 ## 时间复杂度
 对于一个长`n`宽`m`的`Matrix`类，大部分操作的时间复杂度都为O(nm)。但是求矩阵的迹（`const Int trace() const;`）的时间复杂度为O(n)。
 
