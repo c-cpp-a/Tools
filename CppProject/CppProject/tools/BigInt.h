@@ -1,5 +1,6 @@
 #ifndef BIGINT_H_
 #define BIGINT_H_
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -19,7 +20,7 @@ class UnsignedBigInt {
 
   private:
     vector<value_type> val; //值，每位一个数字，采用顺序存储
-    mode_type isstrict;          //是否开启严格模式
+    mode_type isstrict;     //是否开启严格模式
   private:
   public:
     //构造函数&解析函数
@@ -36,6 +37,7 @@ class UnsignedBigInt {
     //类型转换函数
     inline explicit operator bool() const { return !val.empty(); }
     explicit operator string() const;
+    explicit operator maxinteger_type() const;
     //普通函数
     const UnsignedBigInt factorial() const; //返回自己的阶乘
     const maxinteger_type
@@ -81,10 +83,10 @@ class UnsignedBigInt {
     inline const UnsignedBigInt operator/=(const UnsignedBigInt&& a) {
         return ((*this) = (*this) / a);
     }
-    inline const UnsignedBigInt operator%=(const maxinteger_type& a) {
+    inline const UnsignedBigInt operator%=(const UnsignedBigInt& a) {
         return ((*this) = (*this) % a);
     }
-    inline const UnsignedBigInt operator%=(const maxinteger_type&& a) {
+    inline const UnsignedBigInt operator%=(const UnsignedBigInt&& a) {
         return ((*this) = (*this) % a);
     }
     inline const UnsignedBigInt operator^=(const maxinteger_type& a) {
@@ -124,7 +126,8 @@ inline ostream& operator<<(ostream& os, const UnsignedBigInt&& a) {
 }
 istream& operator>>(istream& is, UnsignedBigInt& a);
 istream& operator>>(istream& is, UnsignedBigInt&& a);
-
+const UnsignedBigInt qpow(const UnsignedBigInt& a, const UnsignedBigInt& b,
+                          const UnsignedBigInt& p);
 class BigInt {
   public:
     typedef UnsignedBigInt::value_type value_type;
@@ -136,6 +139,12 @@ class BigInt {
   private:
     UnsignedBigInt val; //值，每位一个数字，采用顺序存储
     bool sign;          //符号，0正数1负数
+  private:
+    inline void turn_sign() {
+        if (val == 0)
+            sign = false;
+    }
+
   public:
     //构造函数&解析函数
     BigInt();
@@ -150,9 +159,10 @@ class BigInt {
     inline explicit operator bool() const { return bool(val); }
     explicit operator string() const;
     explicit operator UnsignedBigInt() const;
+    explicit operator maxinteger_type() const;
     //普通函数
-    bool isnegative() const;        //返回是否为负数
-    const BigInt factorial() const; //返回自己的阶乘
+    bool isnegative() const;              //返回是否为负数
+    const BigInt factorial() const;       //返回自己的阶乘
     void set_strict(strict_mode _strict); //设置严格模式
     strict_mode using_strict() const;     //返回模式
     //重载算术运算符
@@ -193,6 +203,12 @@ class BigInt {
     inline const BigInt operator/=(const BigInt&& a) {
         return ((*this) = (*this) / a);
     }
+    inline const BigInt operator%=(const BigInt& a) {
+        return ((*this) = (*this) % a);
+    }
+    inline const BigInt operator%=(const BigInt&& a) {
+        return ((*this) = (*this) % a);
+    }
     inline const BigInt operator^=(const maxinteger_type& a) {
         return ((*this) = (*this) ^ a);
     }
@@ -229,4 +245,5 @@ inline ostream& operator<<(ostream& os, const BigInt&& a) {
 }
 istream& operator>>(istream& is, BigInt& a);
 istream& operator>>(istream& is, BigInt&& a);
+const BigInt qpow(const BigInt& a, const BigInt& b, const BigInt& p);
 #endif
