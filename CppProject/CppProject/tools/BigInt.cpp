@@ -28,7 +28,8 @@ UnsignedBigInt::UnsignedBigInt(string& s, mode_type _strict)
         else {
             if (isstrict) {
                 val = vector<value_type>();
-                cerr << "UnsignedBigInt::UnsignedBigInt(string& s):find a char "
+                cerr << __func__
+                     << ":find a char "
                         "not number!\n";
                 throw exception();
                 return;
@@ -53,9 +54,9 @@ UnsignedBigInt::UnsignedBigInt(string&& s, mode_type _strict)
         else {
             if (isstrict) {
                 val = vector<value_type>();
-                cerr
-                    << "UnsignedBigInt::UnsignedBigInt(string&& s):find a char "
-                       "not number!\n";
+                cerr << __func__
+                     << ":find a char "
+                        "not number!\n";
                 throw exception();
                 return;
             } else {
@@ -175,8 +176,7 @@ const UnsignedBigInt UnsignedBigInt::operator+(const UnsignedBigInt&& a) const {
 }
 const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt& a) const {
     if ((*this) < a) {
-        cerr << "const UnsignedBigInt UnsignedBigInt::operator-(const "
-                "UnsignedBigInt& a) const:(*this)<a not alivible!\n";
+        cerr << __func__ << ":(*this)<a not alivible!\n";
         throw exception();
         return UnsignedBigInt();
     }
@@ -208,8 +208,7 @@ const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt& a) const {
 }
 const UnsignedBigInt UnsignedBigInt::operator-(const UnsignedBigInt&& a) const {
     if ((*this) < a) {
-        cerr << "const UnsignedBigInt UnsignedBigInt::operator-(const "
-                "UnsignedBigInt&& a) const:(*this)<a not alivible!\n";
+        cerr << __func__ << ":(*this)<a not alivible!\n";
         throw exception();
         return UnsignedBigInt();
     }
@@ -315,8 +314,7 @@ const UnsignedBigInt UnsignedBigInt::operator*(const UnsignedBigInt&& a) const {
 }
 const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt& a) const {
     if (a == 0U) { //不能除以0
-        cerr << "const UnsignedBigInt UnsignedBigInt::operator/(const "
-                "UnsignedBigInt& a) const:Cannot with zero!\n";
+        cerr << __func__ << ":Cannot with zero!\n";
         throw exception();
         return UnsignedBigInt();
     } else if (a == 1U) { //除以1返回自身
@@ -346,8 +344,7 @@ const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt& a) const {
 }
 const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt&& a) const {
     if (a == 0U) { //不能除以0
-        cerr << "const UnsignedBigInt UnsignedBigInt::operator/(const "
-                "UnsignedBigInt&& a) const:Cannot with zero!\n";
+        cerr << __func__ << ":Cannot with zero!\n";
         throw exception();
         return UnsignedBigInt();
     } else if (a == 1U) { //除以1返回自身
@@ -377,8 +374,7 @@ const UnsignedBigInt UnsignedBigInt::operator/(const UnsignedBigInt&& a) const {
 }
 const UnsignedBigInt UnsignedBigInt::operator%(const UnsignedBigInt& a) const {
     if (a == 0U) { //不能对0取余
-        cerr << "const UnsignedBigInt UnsignedBigInt::operator%(const "
-                "UnsignedBigInt& a) const:Cannot with zero!\n";
+        cerr << __func__ << ":Cannot with zero!\n";
         throw exception();
         return UnsignedBigInt();
     } else if (a == 1U) { //任何数%1就是0
@@ -398,8 +394,7 @@ const UnsignedBigInt UnsignedBigInt::operator%(const UnsignedBigInt& a) const {
 }
 const UnsignedBigInt UnsignedBigInt::operator%(const UnsignedBigInt&& a) const {
     if (a == 0U) { //不能对0取余
-        cerr << "const UnsignedBigInt UnsignedBigInt::operator%(const "
-                "UnsignedBigInt&& a) const:Cannot with zero!\n";
+        cerr << __func__ << ":Cannot with zero!\n";
         throw exception();
         return UnsignedBigInt();
     } else if (a == 1U) { //任何数%1就是0
@@ -507,8 +502,7 @@ istream& operator>>(istream& is, UnsignedBigInt& a) {
     try {
         a = tmp;
     } catch (...) {
-        cerr << "istream& operator>>(istream& is, UnsignedBigInt& "
-                "a):Something wrong!\n";
+        cerr << __func__ << ":Something wrong!\n";
         is.exceptions(std::istream::failbit);
     }
     return is;
@@ -519,22 +513,22 @@ istream& operator>>(istream& is, UnsignedBigInt&& a) {
     try {
         a = tmp;
     } catch (...) {
-        cerr << "istream& operator>>(istream& is, UnsignedBigInt&& "
-                "a):Something wrong!\n";
+        cerr << __func__ << ":Something wrong!\n";
         is.exceptions(std::istream::failbit);
     }
     return is;
 }
 //快速幂（mod p意义)
-const UnsignedBigInt qpow(const UnsignedBigInt &a,const UnsignedBigInt &b,const UnsignedBigInt &p){
-    UnsignedBigInt ans=1,tmp=a,nowb=b;
-    while(nowb){
-        if(nowb%2){
-            ans*=tmp;
-            ans%=p;
+const UnsignedBigInt qpow(const UnsignedBigInt& a, const UnsignedBigInt& b,
+                          const UnsignedBigInt& p) {
+    UnsignedBigInt ans = 1, tmp = a, nowb = b;
+    while (nowb) {
+        if (nowb.back() % 2) {
+            ans *= tmp;
+            ans %= p;
         }
-        tmp*=tmp;
-        nowb/=2;
+        tmp *= tmp;
+        nowb /= 2;
     }
     return ans;
 }
@@ -573,7 +567,8 @@ BigInt::BigInt(UnsignedBigInt&& _val) noexcept : val(_val), sign(false) {}
 BigInt::operator string() const { return (sign ? "-" : "") + string(val); }
 BigInt::operator UnsignedBigInt() const {
     if (sign) {
-        cerr << "BigInt::operator UnsignedBigInt() const:Cannot give class "
+        cerr << __func__
+             << ":Cannot give class "
                 "UnsignedBigInt a negative number!\n";
         throw exception();
         return UnsignedBigInt();
@@ -588,7 +583,8 @@ BigInt::operator BigInt::maxinteger_type() const {
 bool BigInt::isnegative() const { return !sign; }
 const BigInt BigInt::factorial() const {
     if (sign) {
-        cerr << "const BigInt BigInt::factorial() const:The factorial of a "
+        cerr << __func__
+             << ":The factorial of a "
                 "negative integer is undefined!\n";
         throw exception();
         return 0LL;
@@ -866,8 +862,7 @@ istream& operator>>(istream& is, BigInt& a) {
     try {
         a = tmp;
     } catch (...) {
-        cerr
-            << "istream& operator>>(istream& is, BigInt& a):Something wrong!\n";
+        cerr << __func__ << ":Something wrong!\n";
         is.exceptions(std::istream::failbit);
     }
     return is;
@@ -878,21 +873,22 @@ istream& operator>>(istream& is, BigInt&& a) {
     try {
         a = tmp;
     } catch (...) {
-        cerr << "istream& operator>>(istream& is, BigInt&& a):Something "
+        cerr << __func__
+             << ":Something "
                 "wrong!\n";
         is.exceptions(std::istream::failbit);
     }
     return is;
 }
-const BigInt qpow(const BigInt &a,const BigInt &b,const BigInt &p){
-    BigInt ans=1,tmp=a,nowb=b;
-    while(nowb>0){
-        if(nowb%2){
-            ans*=tmp;
-            ans%=p;
+const BigInt qpow(const BigInt& a, const BigInt& b, const BigInt& p) {
+    BigInt ans = 1, tmp = a, nowb = b;
+    while (nowb > 0) {
+        if (nowb.back() % 2) {
+            ans *= tmp;
+            ans %= p;
         }
-        tmp*=tmp;
-        nowb/=2;
+        tmp *= tmp;
+        nowb /= 2;
     }
     return ans;
 }

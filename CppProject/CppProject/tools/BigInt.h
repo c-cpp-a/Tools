@@ -44,6 +44,7 @@ class UnsignedBigInt {
     value() const; //转换成整型，用普通函数避免任何意外，注意数太大会越界
     void set_strict(strict_mode _strict); //设置严格模式
     strict_mode using_strict() const;     //返回是否是严格模式
+    inline const size_type back() const{return val.back();}
     //重载算术运算符
     const UnsignedBigInt operator+(const UnsignedBigInt&) const;
     const UnsignedBigInt operator+(const UnsignedBigInt&&) const;
@@ -165,6 +166,7 @@ class BigInt {
     const BigInt factorial() const;       //返回自己的阶乘
     void set_strict(strict_mode _strict); //设置严格模式
     strict_mode using_strict() const;     //返回模式
+    inline const size_type back() const{return val.back();}
     //重载算术运算符
     const BigInt operator-() const;
     const BigInt operator+(const BigInt&) const;
